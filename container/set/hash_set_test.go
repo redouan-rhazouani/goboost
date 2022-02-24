@@ -1,10 +1,10 @@
-package sets
+package set
 
 import (
 	"testing"
 )
 
-func checkSetLen[T comparable](t *testing.T, s USet[T], len int) bool {
+func checkSetLen[T comparable](t *testing.T, s Set[T], len int) bool {
 	t.Helper()
 	if n := s.Len(); n != len {
 		t.Errorf("s.Len() = %d, want %d", n, len)
@@ -13,7 +13,7 @@ func checkSetLen[T comparable](t *testing.T, s USet[T], len int) bool {
 	return true
 }
 
-func checkSet[T comparable](t *testing.T, s USet[T], es []T) bool {
+func checkSet[T comparable](t *testing.T, s Set[T], es []T) bool {
 	t.Helper()
 	if !checkSetLen(t, s, len(es)) {
 		return false
@@ -59,15 +59,15 @@ func TestSetLen(t *testing.T) {
 func TestDisjoint(t *testing.T) {
 	emptySet := Make[int]()
 	tests := []struct {
-		xs, ys USet[int]
+		xs, ys Set[int]
 		want   bool
 	}{
 		{emptySet, emptySet, true},
 		{nil, nil, true},
-		{USet[int]{}, USet[int]{}, true},
+		{Set[int]{}, Set[int]{}, true},
 		{FromSlice([]int{1}), FromSlice([]int{2}), true},
-		{FromSlice([]int{1, 3}), FromSlice([]int{2, 4}), true},
-		{FromSlice([]int{1, 2, 3}), FromSlice([]int{-1, 2, 5}), false},
+		{FromSlice([]int{1, 3}), FromSlice([]int{2, 4,8}), true},
+		{FromSlice([]int{1, 2, 3, 7}), FromSlice([]int{-1, 2, 5}), false},
 	}
 	for _, tc := range tests {
 		s1, s2 := tc.xs, tc.ys
@@ -83,13 +83,13 @@ func TestDisjoint(t *testing.T) {
 func TestSubsetSuperSet(t *testing.T) {
 	xs := FromSlice([]int{1, 2, 3})
 	tests := []struct {
-		xs, ys     USet[int]
+		xs, ys     Set[int]
 		issubset   bool
 		issuperset bool
 	}{
 		{xs, xs, true, true},
 		{nil, nil, true, true},
-		{USet[int]{}, USet[int]{}, true, true},
+		{Set[int]{}, Set[int]{}, true, true},
 		{FromSlice([]int{1}), FromSlice([]int{1}), true, true},
 		{FromSlice([]int{}), FromSlice([]int{1}), true, false},
 		{FromSlice[int](nil), FromSlice([]int{1}), true, false},
@@ -143,13 +143,19 @@ func TestIntersection(t *testing.T) {
 	}
 	for _, tc := range tests {
 		s1, s2 := FromSlice(tc.xs), FromSlice(tc.ys)
+		s2.IntersectionUpdate(s1)
+		checkSet(t, s2, tc.want)
+	}
+	for _, tc := range tests {
+		s1, s2 := FromSlice(tc.xs), FromSlice(tc.ys)
 		checkSet(t, Intersection(s1, s2), tc.want)
+		checkSet(t, Intersection(s2, s1), tc.want)
 	}
 }
 
 func TestDifference(t *testing.T) {
 	xs := []int{3, 5, 11, 77}
-	ys := []int{1, 2, 6, 12, 43}
+	ys := []int{1, 2, 6, 12, 43,-1}
 	zs := append(ys, xs...)
 	tests := []struct {
 		xs, ys []int
@@ -159,6 +165,10 @@ func TestDifference(t *testing.T) {
 		{xs, xs, nil},
 		{[]int{}, []int{}, []int{}},
 		{xs, []int{3}, xs[1:]},
+		{[]int{3},xs,[]int{}},
+		{[]int{3,8},xs,[]int{8}},
+
+
 		{xs, xs[:2], xs[2:]},
 		{zs, xs, ys},
 		{zs, ys, xs},
@@ -240,15 +250,15 @@ func TestUnion(t *testing.T) {
 func TestEquality(t *testing.T) {
 	xs := FromSlice([]int{1, 2, 3})
 	tests := []struct {
-		xs, ys USet[int]
+		xs, ys Set[int]
 		want   bool
 	}{
 		{nil, nil, true},
 		{xs, xs, true},
 		{xs, xs.Copy(), true},
 		{xs, nil, false},
-		{xs, USet[int]{}, false},
-		{USet[int]{}, USet[int]{}, true},
+		{xs, Set[int]{}, false},
+		{Set[int]{}, Set[int]{}, true},
 		{FromSlice([]int{1}), FromSlice([]int{2}), false},
 		{FromSlice([]int{1, 3}), FromSlice([]int{2, 4}), false},
 		{FromSlice([]int{1, 2, 3}), xs, true},
