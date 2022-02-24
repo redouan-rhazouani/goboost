@@ -1,10 +1,10 @@
-package sets
+package set
 
 import (
 	"testing"
 )
 
-func checkSetLen[T comparable](t *testing.T, s USet[T], len int) bool {
+func checkSetLen[T comparable](t *testing.T, s Set[T], len int) bool {
 	t.Helper()
 	if n := s.Len(); n != len {
 		t.Errorf("s.Len() = %d, want %d", n, len)
@@ -13,7 +13,7 @@ func checkSetLen[T comparable](t *testing.T, s USet[T], len int) bool {
 	return true
 }
 
-func checkSet[T comparable](t *testing.T, s USet[T], es []T) bool {
+func checkSet[T comparable](t *testing.T, s Set[T], es []T) bool {
 	t.Helper()
 	if !checkSetLen(t, s, len(es)) {
 		return false
@@ -59,12 +59,12 @@ func TestSetLen(t *testing.T) {
 func TestDisjoint(t *testing.T) {
 	emptySet := Make[int]()
 	tests := []struct {
-		xs, ys USet[int]
+		xs, ys Set[int]
 		want   bool
 	}{
 		{emptySet, emptySet, true},
 		{nil, nil, true},
-		{USet[int]{}, USet[int]{}, true},
+		{Set[int]{}, Set[int]{}, true},
 		{FromSlice([]int{1}), FromSlice([]int{2}), true},
 		{FromSlice([]int{1, 3}), FromSlice([]int{2, 4}), true},
 		{FromSlice([]int{1, 2, 3}), FromSlice([]int{-1, 2, 5}), false},
@@ -83,13 +83,13 @@ func TestDisjoint(t *testing.T) {
 func TestSubsetSuperSet(t *testing.T) {
 	xs := FromSlice([]int{1, 2, 3})
 	tests := []struct {
-		xs, ys     USet[int]
+		xs, ys     Set[int]
 		issubset   bool
 		issuperset bool
 	}{
 		{xs, xs, true, true},
 		{nil, nil, true, true},
-		{USet[int]{}, USet[int]{}, true, true},
+		{Set[int]{}, Set[int]{}, true, true},
 		{FromSlice([]int{1}), FromSlice([]int{1}), true, true},
 		{FromSlice([]int{}), FromSlice([]int{1}), true, false},
 		{FromSlice[int](nil), FromSlice([]int{1}), true, false},
@@ -240,15 +240,15 @@ func TestUnion(t *testing.T) {
 func TestEquality(t *testing.T) {
 	xs := FromSlice([]int{1, 2, 3})
 	tests := []struct {
-		xs, ys USet[int]
+		xs, ys Set[int]
 		want   bool
 	}{
 		{nil, nil, true},
 		{xs, xs, true},
 		{xs, xs.Copy(), true},
 		{xs, nil, false},
-		{xs, USet[int]{}, false},
-		{USet[int]{}, USet[int]{}, true},
+		{xs, Set[int]{}, false},
+		{Set[int]{}, Set[int]{}, true},
 		{FromSlice([]int{1}), FromSlice([]int{2}), false},
 		{FromSlice([]int{1, 3}), FromSlice([]int{2, 4}), false},
 		{FromSlice([]int{1, 2, 3}), xs, true},
