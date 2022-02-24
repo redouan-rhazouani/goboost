@@ -94,8 +94,9 @@ func (s Set[T]) IntersectionUpdate(o Set[T]) {
 
 // DifferenceUpdate the set, removing elements that are not in o
 func (s Set[T]) DifferenceUpdate(o Set[T]) {
-	for v := range s {
-		if _, ok := o[v]; ok {
+	s1, s2 := swapLess(s, o)
+	for v := range s1 {
+		if _, ok := s2[v]; ok {
 			delete(s, v)
 		}
 	}
@@ -120,8 +121,9 @@ func (s Set[T]) SymmetricDifferenceUpdate(o Set[T]) {
 // IsDisjoint return true if sets s and o has no element in common.
 // Two sets are disjoint if and only their intersection is the empty set
 func (s Set[T]) IsDisjoint(o Set[T]) bool {
-	for v := range s {
-		if _, ok := o[v]; ok {
+	s1, s2 := swapLess(s, o)
+	for v := range s1 {
+		if _, ok := s2[v]; ok {
 			return false
 		}
 	}
@@ -200,12 +202,20 @@ func Union[T comparable](s, o Set[T]) Set[T] {
 // Intersection returns new set with elements common to set s and o
 func Intersection[T comparable](s, o Set[T]) Set[T] {
 	intersect := make(Set[T])
+	s, o = swapLess(s, o)
 	for v := range s {
 		if _, ok := o[v]; ok {
 			intersect[v] = struct{}{}
 		}
 	}
 	return intersect
+}
+
+func swapLess[T comparable](s, o Set[T]) (Set[T], Set[T]) {
+	if len(s) < len(o) {
+		return s, o
+	}
+	return o, s
 }
 
 // Difference returns new set with elements in the set s that are not in o
