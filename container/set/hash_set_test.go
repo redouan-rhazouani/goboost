@@ -274,7 +274,7 @@ func TestEquality(t *testing.T) {
 func TestForEach(t *testing.T) {
 	xs := FromSlice([]int{1, 2, 3})
 	sum := 0
-	xs.ForEach(func(v int) { sum += v })
+	xs.Do(func(v int) { sum += v })
 	if sum != 6 {
 		t.Errorf("sum got %v want %v", sum, 6)
 	}

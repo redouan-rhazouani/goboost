@@ -68,9 +68,9 @@ func (s Set[T]) Contains(v T) bool {
 	return ok
 }
 
-// ForEach applies function f to each element of s
+// Do applies function f to each element of s
 // It's ok for to call s.Delete(v)
-func (s Set[T]) ForEach(f func(T)) {
+func (s Set[T]) Do(f func(T)) {
 	for v := range s {
 		f(v)
 	}
@@ -92,9 +92,9 @@ func (s Set[T]) IntersectionUpdate(o Set[T]) {
 	}
 }
 
-// DifferenceUpdate the set, removing elements that are not in o
+// DifferenceUpdate the set, removing elements found in o
 func (s Set[T]) DifferenceUpdate(o Set[T]) {
-	s1, s2 := swapLess(s, o)
+	s1, s2 := swapIfLess(s, o)
 	for v := range s1 {
 		if _, ok := s2[v]; ok {
 			delete(s, v)
@@ -119,9 +119,9 @@ func (s Set[T]) SymmetricDifferenceUpdate(o Set[T]) {
 }
 
 // IsDisjoint return true if sets s and o has no element in common.
-// Two sets are disjoint if and only their intersection is the empty set
+// Two sets are disjoint if and only if their intersection is the empty set
 func (s Set[T]) IsDisjoint(o Set[T]) bool {
-	s1, s2 := swapLess(s, o)
+	s1, s2 := swapIfLess(s, o)
 	for v := range s1 {
 		if _, ok := s2[v]; ok {
 			return false
@@ -130,7 +130,7 @@ func (s Set[T]) IsDisjoint(o Set[T]) bool {
 	return true
 }
 
-// IsSubset test whether every element is s is also in o
+// IsSubset test whether every element in s is also in o
 func (s Set[T]) IsSubset(o Set[T]) bool {
 	if s.Len() > o.Len() {
 		return false
@@ -143,7 +143,7 @@ func (s Set[T]) IsSubset(o Set[T]) bool {
 	return true
 }
 
-// IsSuperset test whether every element is o is also in s
+// IsSuperset test whether every element in o is also in s
 func (s Set[T]) IsSuperset(o Set[T]) bool {
 	return o.IsSubset(s)
 }
@@ -177,6 +177,7 @@ func (s Set[T]) Equal(o Set[T]) bool {
 	return true
 }
 
+// Slice returns set elements as a slice
 func (s Set[T]) Slice() []T {
 	a := make([]T, len(s))
 	i := 0
@@ -202,7 +203,7 @@ func Union[T comparable](s, o Set[T]) Set[T] {
 // Intersection returns new set with elements common to set s and o
 func Intersection[T comparable](s, o Set[T]) Set[T] {
 	intersect := make(Set[T])
-	s, o = swapLess(s, o)
+	s, o = swapIfLess(s, o)
 	for v := range s {
 		if _, ok := o[v]; ok {
 			intersect[v] = struct{}{}
@@ -211,7 +212,8 @@ func Intersection[T comparable](s, o Set[T]) Set[T] {
 	return intersect
 }
 
-func swapLess[T comparable](s, o Set[T]) (Set[T], Set[T]) {
+// swapIfLess swap both sets if len(s) < len(o)
+func swapIfLess[T comparable](s, o Set[T]) (Set[T], Set[T]) {
 	if len(s) < len(o) {
 		return s, o
 	}
