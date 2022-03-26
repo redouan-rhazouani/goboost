@@ -125,6 +125,7 @@ func (vec *Vector[T]) Clear() {
 	*vec = s[:0]
 }
 
+// RemoveFunc removes all elements satisfying f()
 func (vec *Vector[T]) RemoveFunc(f func(v T) bool) {
 	s := *vec
 	i := s.IndexFunc(f)
