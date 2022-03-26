@@ -1,18 +1,8 @@
 package forward_list
 
 import (
-	"fmt"
 	"testing"
 )
-
-func ilistString(l *ForwardList[int]) string {
-	ints := []int{}
-	f := func(v int) {
-		ints = append(ints, v)
-	}
-	l.Do(f)
-	return fmt.Sprintf("%v", ints)
-}
 
 func checkListLen[T any](t *testing.T, l *ForwardList[T], len int) bool {
 	t.Helper()
@@ -233,5 +223,50 @@ func TestReverse(t *testing.T) {
 	checkList(t, l, []int{1, 2, 3})
 	l.Reverse()
 	checkList(t, l, []int{3, 2, 1})
+	l.Reverse()
+	l.PushBack(4)
+	checkList(t, l, []int{1, 2, 3, 4})
+	l.Reverse()
+	checkList(t, l, []int{4, 3, 2, 1})
+	l.Reverse()
+	checkList(t, l, []int{1, 2, 3, 4})
 
+}
+
+func TestUnique(t *testing.T) {
+	eq := func(a, b int) bool { return a == b }
+	l := New[int]()
+	l.Unique(eq)
+	checkList(t, l, []int{})
+	e1 := l.PushBack(1)
+	checkListPointers(t, l, []*Element[int]{e1})
+	l.PushBack(1)
+	l.Unique(eq)
+	checkListPointers(t, l, []*Element[int]{e1})
+	e2 := l.PushBack(2)
+	e3 := l.PushBack(3)
+	l.PushBack(3)
+	l.Unique(eq)
+	checkListPointers(t, l, []*Element[int]{e1, e2, e3})
+	e4 := l.PushBack(1)
+	l.Unique(eq)
+	checkListPointers(t, l, []*Element[int]{e1, e2, e3, e4})
+
+}
+
+func TestDo(t *testing.T) {
+	l := New[int]()
+	l.PushFront(1)
+	l.PushFront(0)
+	l.PushFront(2)
+	l.PushFront(3)
+
+	sum := 0
+	f := func(v int) {
+		sum += v
+	}
+	l.Do(f)
+	if sum != 6 {
+		t.Errorf("sum got=%d want 6", sum)
+	}
 }

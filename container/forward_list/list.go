@@ -218,13 +218,30 @@ func (l *ForwardList[T]) Reverse() {
 	if l.Len() < 2 {
 		return
 	}
-	var prev, next *Element[T]
+	var prev *Element[T]
 	first := l.Front()
 	last := l.Back()
 	for e := first; e != nil; {
-		e.next, next = prev, e.next
-		prev, e = e, next
+		e.next, e, prev = prev, e.next, e
 	}
 	l.back = first
 	l.root.next = last
+}
+
+// Unique removes all consecutive duplicate elements from list l.
+// Only the first element in each group of equal elements is left.
+func (l *ForwardList[T]) Unique(f func(a, b T) bool) {
+	if l.Len() < 1 {
+		return
+	}
+	prev := l.Front()
+	for e := prev.Next(); e != nil; {
+		if f(prev.Value, e.Value) {
+			e = l.RemoveAfter(prev)
+			continue
+		}
+		prev = e
+		e = e.Next()
+	}
+
 }
