@@ -32,6 +32,9 @@ func checkListPointers[T any](t *testing.T, l *ForwardList[T], es []*Element[T])
 	for i, e := range es {
 		next := root // l.back.next = root
 		Next := (*Element[T])(nil)
+		if e.list != l {
+			t.Errorf("e.list got=%v, want %v", e.list, l)
+		}
 		if i < len(es)-1 {
 			next = es[i+1]
 			Next = next
