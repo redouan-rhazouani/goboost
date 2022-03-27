@@ -273,3 +273,34 @@ func TestDo(t *testing.T) {
 		t.Errorf("sum got=%d want 6", sum)
 	}
 }
+
+func TestSwap(t *testing.T) {
+	l1 := New[int]()
+	e1 := l1.PushBack(1)
+	e2 := l1.PushBack(2)
+	l2 := New[int]()
+	e3 := l2.PushBack(3)
+	e4 := l2.PushBack(4)
+	e5 := l2.PushBack(5)
+	checkListPointers(t, l1, []*Element[int]{e1, e2})
+	checkListPointers(t, l2, []*Element[int]{e3, e4, e5})
+	l1.swap(l2)
+	e6 := l2.PushBack(6)
+	checkListPointers(t, l2, []*Element[int]{e1, e2, e6})
+	checkListPointers(t, l1, []*Element[int]{e3, e4, e5})
+
+	l2.Clear()
+	l1.swap(l2)
+	checkListPointers(t, l1, []*Element[int]{})
+	checkListPointers(t, l2, []*Element[int]{e3, e4, e5})
+	e1 = l2.PushFront(1)
+	e6 = l2.PushBack(6)
+	// l1.print()
+	// l2.print()
+	l1.swap(l2)
+	// l1.print()
+	// l2.print()
+	checkListPointers(t, l2, []*Element[int]{})
+	checkListPointers(t, l1, []*Element[int]{e1, e3, e4, e5, e6})
+
+}

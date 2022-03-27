@@ -7,6 +7,8 @@
 //
 package forward_list
 
+import "fmt"
+
 type Element[T any] struct {
 	// Next pointer to the next element in the singly-linked list.
 	next *Element[T]
@@ -247,4 +249,39 @@ func (l *ForwardList[T]) Unique(f func(a, b T) bool) {
 		prev = e
 		e = e.Next()
 	}
+}
+
+func (l *ForwardList[T]) swap(o *ForwardList[T]) {
+	// l.print()
+	// other.print()
+	for e := l.root.next; e != &l.root; e = e.next {
+		e.list = o
+	}
+	for e := o.root.next; e != &o.root; e = e.next {
+		e.list = l
+	}
+
+	l.root.next, o.root.next = o.root.next, l.root.next
+	l.back, o.back = o.back, l.back
+	l.len, o.len = o.len, l.len
+	if l.root.next == &o.root {
+		l.root.next = &l.root
+		l.back = &l.root
+	}
+	l.back.next = &l.root
+	if o.root.next == &l.root {
+		o.root.next = &o.root
+		o.back = &o.root
+	}
+	o.back.next = &o.root
+}
+
+func (l *ForwardList[T]) print() {
+	fmt.Printf("%p %v, \n", &l.root, l.root)
+	for e := l.Front(); e != nil; e = e.Next() {
+		fmt.Printf("%p %v, ", e, e)
+	}
+	fmt.Printf("%p %v \n", l.back, l.back)
+
+	fmt.Println()
 }
