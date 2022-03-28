@@ -1,3 +1,3 @@
-module github.com/redouan-rhazouani/gboost
+module github.com/redouan-rhazouani/goboost
 
 go 1.18
