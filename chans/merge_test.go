@@ -15,4 +15,9 @@ func TestMerge(t *testing.T) {
 	if m := len(a); m != 2*n {
 		t.Errorf("Number of elements got=%d want=%d", m, 2*n)
 	}
+	c1 = Repeat(1, n)
+	Drain(c1)
+	if _, ok := <-c1; ok {
+		t.Errorf("channel must be closed after being drained")
+	}
 }
