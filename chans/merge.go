@@ -7,7 +7,7 @@ func Drain[T any](c <-chan T) {
 	}
 }
 
-// Merge a pair of channels into a single channel
+// Merge pair of channels into a single one
 func Merge[T any](c1, c2 <-chan T) <-chan T {
 	r := make(chan T)
 	go func(c1, c2 <-chan T, r chan<- T) {

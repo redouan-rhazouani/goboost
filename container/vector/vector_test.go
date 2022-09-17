@@ -10,11 +10,11 @@ func eq(v int) func(int) bool {
 
 func TestVector(t *testing.T) {
 	vec := Make[int](0, 3)
-	if m, n := vec.Len(), vec.Capacity(); m != 0 || n != 3 {
+	if m, n := vec.Len(), vec.Cap(); m != 0 || n != 3 {
 		t.Errorf("(len, cap) got = (%d,%d )want (%d,%d)", m, n, 0, 3)
 	}
 	vec = Make[int](1, 3)
-	if m, n := vec.Len(), vec.Capacity(); m != 1 || n != 3 {
+	if m, n := vec.Len(), vec.Cap(); m != 1 || n != 3 {
 		t.Errorf("(len, cap) got = (%d,%d )want (%d,%d)", m, n, 1, 3)
 	}
 }

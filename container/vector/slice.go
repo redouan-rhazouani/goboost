@@ -44,7 +44,7 @@ func Remove[S ~[]T, T comparable](p *S, v T) {
 			i++
 		}
 	}
-	zeroRange[T](s, i, j)
+	zeroRange(s, i, j)
 	*p = s[:i]
 }
 

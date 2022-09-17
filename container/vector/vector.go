@@ -1,7 +1,7 @@
-// Package vector implements dynamic size arrays
+// Package vector implements a contiguous growable array type
 package vector
 
-// Vector is a sequence container that encapsulates dynamic size arrays
+// Vector is a wrapper around a generic slice.
 type Vector[T any] []T
 
 // Make construct a vector with specified length and capacity.
@@ -14,8 +14,8 @@ func Make[T any](length, capacity int) Vector[T] {
 	return make([]T, length, capacity)
 }
 
-// Capacity returns the number of elements the vector can hold without allocating
-func (vec Vector[T]) Capacity() int {
+// Cap returns the number of elements the vector can hold without allocating
+func (vec Vector[T]) Cap() int {
 	return cap(vec)
 }
 
