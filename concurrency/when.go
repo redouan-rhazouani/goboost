@@ -29,7 +29,7 @@ func RunGroup(fns ...func()) {
 }
 
 // WhenAll runs tasks concurrently and wait until
-// all tasks finish successfuly or a leat one of them fails.
+// all tasks finish successfuly or at leat one of them fails.
 // The returned channel contains the result of each task.
 func WhenAll[T any](ctx context.Context, tasks ...Task[T]) <-chan TaskResult[T] {
 	N := len(tasks)
@@ -50,11 +50,8 @@ func WhenAll[T any](ctx context.Context, tasks ...Task[T]) <-chan TaskResult[T] 
 		}
 		// wait for all task to stop
 		for i := 0; i < N; i++ {
-			select {
-			case err := <-errs:
-				if err != nil {
-					cancel() // it is safe to call cancel many times
-				}
+			if err := <-errs; err != nil {
+				cancel() // it is safe to call cancel many times
 			}
 		}
 	}(results)
@@ -67,16 +64,18 @@ func WhenAny[T any](ctx context.Context, funcs ...Task[T]) <-chan TaskResult[T] 
 	results := make(chan TaskResult[T], 1)
 	go func(results chan<- TaskResult[T]) {
 		defer close(results)
-		var count int32
+
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
+
+		var count int32
 		errs := make(chan error, N)
 		for _, fn := range funcs {
 			go func(f Task[T]) {
 				res, err := f(ctx)
 				if err == nil && atomic.CompareAndSwapInt32(&count, 0, 1) {
 					results <- TaskResult[T]{res, err}
-					cancel() // winner
+					cancel() // we have a winner
 				}
 				errs <- err
 			}(fn)
