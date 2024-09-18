@@ -6,11 +6,11 @@ import (
 	"golang.org/x/sync/semaphore"
 )
 
-// A Mutex is a mutual exclusion lock.
-// In additon to standard lock interface Mutex allows goroutines to
-// cancell waiting for mutex to be availale when their contexts get cancelled.
-// The use need to call NewMutex() to get an unlocked mutex
-// A Mutex must not be copied after first use.
+// Mutex is a mutual exclusion lock with additional support for context cancellation.
+// Unlike a standard lock, this Mutex allows goroutines to cancel their wait for the lock
+// if their contexts are cancelled, improving responsiveness in cancellation scenarios.
+// To create a new, unlocked Mutex, use NewMutex().
+// Note: A Mutex must not be copied after it has been used.
 
 type Mutex semaphore.Weighted
 
@@ -19,33 +19,34 @@ func NewMutex() *Mutex {
 	return (*Mutex)(semaphore.NewWeighted(1))
 }
 
-// Lock locks m.
-// If the lock is already in use, the calling goroutine
-// blocks until the mutex is available.
+// Lock acquires the mutex 'm'.
+// If the mutex is already locked, the calling goroutine will block
+// until the lock becomes available
 func (m *Mutex) Lock() {
 	(*semaphore.Weighted)(m).Acquire(context.Background(), 1)
 }
 
-// Unlock unlocks m.
-// It will panic if m has been locked before
+// Unlock releases the mutex 'm'.
+// It will panic if 'm' is not locked
 func (m *Mutex) Unlock() {
 	(*semaphore.Weighted)(m).Release(1)
 }
 
-// TryLock tries to lock m and reports whether it succeeded
+// TryLock attempts to acquire the mutex 'm' without blocking, returning true if
+// the lock was successfully acquired, and false otherwise.
 //
-// Note that while correct uses of TryLock do exist, they are rare,
-// and use of TryLock is often a sign of a deeper problem
-// in a particular use of mutexes.
+// While there are legitimate use cases for TryLock, they are uncommon.
+// Frequent use of TryLock may indicate a deeper issue in the design or
+// usage pattern of mutexes.
 func (m *Mutex) TryLock() bool {
 	return (*semaphore.Weighted)(m).TryAcquire(1)
 }
 
-// LockWithContext tries to lock m, blocking until mutex
-// is available or ctx is done. On success, returns nil. On failure, returns
-// ctx.Err()
+// LockWithContext attempts to acquire the mutex 'm', blocking until the mutex
+// becomes available or the context 'ctx' is done. On success, it returns nil.
+// If the operation fails due to 'ctx' being done, it returns ctx.Err().
 //
-// If ctx is already done, LockWithContext may still succeed without blocking.
+// Note: If 'ctx' is already done, LockWithContext may still acquire the lock without blocking.
 func (m *Mutex) LockWithContext(ctx context.Context) error {
 	return (*semaphore.Weighted)(m).Acquire(ctx, 1)
 }

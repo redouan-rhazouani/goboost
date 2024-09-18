@@ -1,6 +1,7 @@
 package sync
 
 import (
+	"context"
 	"runtime"
 	"testing"
 	"time"
@@ -65,7 +66,7 @@ func TestMutexFairness(t *testing.T) {
 	}
 }
 
-func HammerMutex(m *Mutex, loops int, cdone chan bool) {
+func HammerMutex(m *Mutex, loops int, done chan bool) {
 	for i := 0; i < loops; i++ {
 		if i%3 == 0 {
 			if m.TryLock() {
@@ -76,5 +77,19 @@ func HammerMutex(m *Mutex, loops int, cdone chan bool) {
 		m.Lock()
 		m.Unlock()
 	}
-	cdone <- true
+	done <- true
+}
+
+func TestLockWithContext_CanceledContext(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
+	cancel()
+
+	m := NewMutex()
+	m.Lock()
+	defer m.Unlock()
+
+	err := m.LockWithContext(ctx)
+	if err == nil {
+		t.Fatalf("expected an error, got nil")
+	}
 }
