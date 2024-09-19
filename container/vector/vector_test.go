@@ -1,6 +1,7 @@
 package vector
 
 import (
+	"slices"
 	"testing"
 )
 
@@ -41,9 +42,8 @@ func TestSwapDelete(t *testing.T) {
 		s := v
 		if e := v.SwapDelete(tc.idx); e != tc.elem {
 			t.Errorf("case-%d: %v.SwapDelete(%d) got=%v want %v", i, e, tc.idx, e, tc.elem)
-
 		}
-		if !Equal(v, Vector[int](tc.ys)) {
+		if !slices.Equal(v, Vector[int](tc.ys)) {
 			t.Errorf("case-%d: %v.SwapDelete(%d) got=%v want %v", i, tc.xs, tc.idx, v, tc.ys)
 		}
 
@@ -77,9 +77,8 @@ func TestDelete(t *testing.T) {
 		v = v.Copy()
 		if e := v.Delete(tc.idx); e != tc.elem {
 			t.Errorf("case-%d: %v.Delete(%d) got=%v want %v", i, e, tc.idx, e, tc.elem)
-
 		}
-		if !Equal(v, Vector[int](tc.ys)) {
+		if !slices.Equal(v, Vector[int](tc.ys)) {
 			t.Errorf("case-%d: %v.Delete(%d) got=%v want %v", i, tc.xs, tc.idx, v, tc.ys)
 		}
 	}
@@ -106,9 +105,8 @@ func TestDeleteRange(t *testing.T) {
 		v := Vector[int](c.xs).Copy()
 		os := v
 		v.DeleteRange(c.low, c.high)
-		if !Equal(v, c.ys) {
+		if !slices.Equal(v, c.ys) {
 			t.Errorf("%v.DeleteRange(%d, %d) got=%v want %v", c.xs, c.low, c.high, v, c.ys)
-
 		}
 		if m, n := Count(os, 0), len(c.xs)-v.Len(); m != n {
 			t.Errorf("Count(%v, 0) got=%v want %v", os, m, n)
@@ -142,36 +140,7 @@ func TestAt(t *testing.T) {
 	}
 }
 
-func TestIndex(t *testing.T) {
-
-	tests := []struct {
-		vec []int
-		v   int
-		i   int
-	}{
-		{[]int{}, 1, -1},
-		{[]int{1}, 1, 0},
-		{[]int{0}, 1, -1},
-		{[]int{1, 2, 3}, 0, -1},
-		{[]int{1, 2, 2, 3}, 2, 1},
-		{[]int{1, 2, 3, 3}, 3, 2},
-		{[]int{1, 2, 3}, 4, -1},
-	}
-
-	for _, c := range tests {
-		vec := Vector[int](c.vec)
-		if g := Index(vec, c.v); g != c.i {
-			t.Errorf("%v.Index(%v) got = %d want = %d", vec, c.v, g, c.i)
-		}
-		if g := vec.IndexFunc(eq(c.v)); g != c.i {
-			t.Errorf("%v.IndexFunc(%v) got = %d want = %d", vec, c.v, g, c.i)
-		}
-
-	}
-}
-
 func TestLastIndex(t *testing.T) {
-
 	tests := []struct {
 		vec []int
 		v   int
@@ -202,33 +171,6 @@ func TestLastIndex(t *testing.T) {
 	}
 }
 
-func TestEqual(t *testing.T) {
-	v1 := Make[int](0, 7)
-	if !Equal(v1, v1) {
-		t.Errorf("Empty vector must be equal to itself")
-	}
-	v1.Append(1, 2, 3)
-	if !Equal(v1, v1) {
-		t.Errorf("Empty vector must be equal to itself")
-	}
-	u := v1.Copy()
-	if !Equal(v1, u) {
-		t.Errorf("Empty vector must be equal to its copy")
-	}
-
-	if v2 := v1[2:]; Equal(v1, v2) {
-		t.Errorf("%v.Equal(%v) got = %v want %v", v1, v2, true, false)
-	}
-	if v2 := v1[1:]; Equal(v1, v2) {
-		t.Errorf("%v.Equal(%v) got = %v want %v", v1, v2, true, false)
-	}
-	v2 := v1.Copy()
-	v2[len(v2)-1] = 11
-	if Equal(v1, v2) {
-		t.Errorf("%v.Equal(%v) got = %v want %v", v1, v2, true, false)
-	}
-}
-
 func TestAppend(t *testing.T) {
 	v1 := Make[int](0, 7)
 	v1.Append(1, 2)
@@ -239,7 +181,7 @@ func TestAppend(t *testing.T) {
 	v1.Append(5)
 	v1.Push(6)
 	v2 := []int{1, 2, 3, 4, 5, 6}
-	if !Equal(v1, v2) {
+	if !slices.Equal(v1, v2) {
 		t.Errorf("append got %v want %v", v1, v2)
 	}
 	v3 := Make[int](0, 7)
@@ -247,7 +189,7 @@ func TestAppend(t *testing.T) {
 		v3.Push(v1.Pop())
 	}
 	v2 = []int{1, 2, 3, 4, 5, 6}
-	if !Equal(v3, []int{6, 5, 4, 3, 2, 1}) {
+	if !slices.Equal(v3, []int{6, 5, 4, 3, 2, 1}) {
 		t.Errorf("append got %v want %v", v1, v2)
 	}
 }
@@ -273,9 +215,8 @@ func TestRemove(t *testing.T) {
 		v := Vector[int](c.xs).Copy()
 		os := v
 		v.RemoveFunc(eq(c.val))
-		if !Equal(v, c.ys) {
+		if !slices.Equal(v, c.ys) {
 			t.Errorf("%v.RemoveFunc(%d) got=%v want %v", c.xs, c.val, v, c.ys)
-
 		}
 		if m, n := Count(os, 0), len(c.xs)-v.Len(); m != n {
 			t.Errorf("Count(%v, 0) got=%v want %v", os, m, n)
@@ -285,10 +226,9 @@ func TestRemove(t *testing.T) {
 	for _, c := range tests {
 		v := Vector[int](c.xs).Copy()
 		os := v
-		Remove(&v, c.val)
-		if !Equal(v, c.ys) {
+		v = Remove(v, c.val)
+		if !slices.Equal(v, c.ys) {
 			t.Errorf("Remove(%v,%d) got=%v want %v", c.xs, c.val, v, c.ys)
-
 		}
 		if m, n := Count(os, 0), len(c.xs)-v.Len(); m != n {
 			t.Errorf("Count(%v, 0) got=%v want %v", os, m, n)
