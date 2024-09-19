@@ -1,38 +1,26 @@
 package vector
 
-func Partition(a []int, pred func(i int) bool) int {
-	i, j := 0, len(a)-1
-	for i < j {
-		for i < len(a) && pred(i) {
-			i++
-		}
-		for j > i && !pred(j) {
-			j--
-		}
-
-		if i < j {
-			a[i], a[j] = a[j], a[i]
-			j--
-			i++
-		}
-
-	}
-	return i
-}
-
-// Examines the partitioned range [0, n) and locates the end of the first partition, that is, the first element that does not satisfy p or last if all elements satisfy p.
-// If the elements elem of [0, n) are not partitioned with respect to the expression bool(p(elem)), the behavior is undefined.
-func PartitionPoint(a []int, pred func(i int) bool) int {
-	length := len(a)
+// Partition rearranges the elements of the sequence 'a' based on the predicate 'f'.
+// Elements for which 'f' returns true are moved to the front, and elements for
+// which it returns false are moved to the back. The relative order of the elements
+// within each partition is not preserved.
+// It returns the index where the partition is split, i.e., the first element in the
+// sequence that evaluates to false
+func Partition[S ~[]E, E any](a S, f func(i int) bool) int {
 	first := 0
-	for length > 0 {
-		half := length / 2
-		mid := first + half
-		if pred(mid) {
-			first = mid + 1
-			length -= (half + 1)
-		} else {
-			length = half
+	for ; first < len(a); first++ {
+		if !f(first) {
+			break
+		}
+	}
+	if first == len(a) {
+		return first
+	}
+
+	for i := first + 1; i < len(a); i++ {
+		if f(i) {
+			a[i], a[first] = a[first], a[i]
+			first++
 		}
 	}
 	return first
@@ -55,4 +43,21 @@ func IsPartitioned(n int, f func(i int) bool) bool {
 		}
 	}
 	return true
+}
+
+// Examines the partitioned range [0, n) and returns the index of the first element
+// that does not satisfy the predicate 'p', or 'n' if all elements satisfy 'p'.
+// If the elements in the range [0, n) are not partitioned according to the predicate
+// 'f' the behavior is undefined.
+func PartitionPoint(n int, f func(i int) bool) int {
+	i, j := 0, n
+	for i < j {
+		h := int(uint(i+j) >> 1)
+		if f(h) {
+			i = h + 1
+		} else {
+			j = h
+		}
+	}
+	return i
 }

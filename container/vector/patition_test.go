@@ -16,7 +16,7 @@ func TestPartitionWithDistinctElements(t *testing.T) {
 	if result != expected {
 		t.Errorf("Expected %d, but got %d", expected, result)
 	}
-	pp := PartitionPoint(a, predicate)
+	pp := PartitionPoint(len(a), predicate)
 	if pp != expected {
 		t.Errorf("Expected %d, but got %d", expected, pp)
 	}
@@ -35,7 +35,7 @@ func TestPartitionAllElementsSatisfyPredicate(t *testing.T) {
 		t.Errorf("Expected index %d, but got %d", len(a), index)
 	}
 
-	pp := PartitionPoint(a, pred)
+	pp := PartitionPoint(len(a), pred)
 	if pp != index {
 		t.Errorf("Expected %d, but got %d", index, pp)
 	}
@@ -52,7 +52,7 @@ func TestPartitionAllElementsNotSatisfyingPredicate(t *testing.T) {
 	if index != 0 {
 		t.Errorf("Expected index %d, but got %d", 0, index)
 	}
-	pp := PartitionPoint(a, pred)
+	pp := PartitionPoint(len(a), pred)
 	if pp != index {
 		t.Errorf("Expected %d, but got %d", index, pp)
 	}
@@ -69,7 +69,7 @@ func TestPartitionAllIdenticalElements(t *testing.T) {
 	if index != len(a) {
 		t.Errorf("Expected index %d, but got %d", len(a), index)
 	}
-	pp := PartitionPoint(a, pred)
+	pp := PartitionPoint(len(a), pred)
 	if pp != index {
 		t.Errorf("Expected %d, but got %d", index, pp)
 	}
@@ -85,7 +85,7 @@ func TestPartitionPointSimplePredicate(t *testing.T) {
 		t.Errorf("Expected %v to be not partitioned", a)
 	}
 	Partition(a, isEven)
-	result := PartitionPoint(a, isEven)
+	result := PartitionPoint(len(a), isEven)
 	expected := 4
 	if result != expected {
 		t.Errorf("Expected %d, but got %d", expected, result)
