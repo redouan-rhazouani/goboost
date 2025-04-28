@@ -79,15 +79,12 @@ func (s HashSet[T]) DeleteFunc(pred func(T) bool) {
 	maps.DeleteFunc(s.m, func(k T, _ struct{}) bool { return pred(k) })
 }
 
-// Copy copies all key/value pairs in src adding them to dst.
-// When a key in src is already present in dst,
-// the value in dst will be overwritten by the value associated
-// with the key in src.
+// Copy copies all elements in src adding them to dst.
 func Copy[E comparable](dst, src HashSet[E]) {
 	maps.Copy(dst.m, src.m)
 }
 
-// IntersectionUpdate set, keeping only common elements between s and o
+// IntersectionUpdate set, keeping only common elements between s and other
 func (s HashSet[T]) IntersectionUpdate(other HashSet[T]) {
 	for v := range s.m {
 		if _, ok := other.m[v]; !ok {
@@ -96,7 +93,7 @@ func (s HashSet[T]) IntersectionUpdate(other HashSet[T]) {
 	}
 }
 
-// DifferenceUpdate the set, removing elements found in o
+// DifferenceUpdate the set, removing elements found in other
 func (s HashSet[T]) DifferenceUpdate(other HashSet[T]) {
 	s1, s2 := swapIfLess(s, other)
 	for v := range s1.m {
@@ -106,7 +103,8 @@ func (s HashSet[T]) DifferenceUpdate(other HashSet[T]) {
 	}
 }
 
-// SymmetricDifferenceUpdate, keeping elements found in either s or o but not in both
+// SymmetricDifferenceUpdate, keeping elements found in either s or other
+// , that is, values present in either s or other,but not in both
 func (s HashSet[T]) SymmetricDifferenceUpdate(other HashSet[T]) {
 	complement := make(map[T]struct{})
 	for v := range s.m {
@@ -122,7 +120,7 @@ func (s HashSet[T]) SymmetricDifferenceUpdate(other HashSet[T]) {
 	}
 }
 
-// IsDisjoint return true if sets s and o has no element in common.
+// IsDisjoint return true if sets s and other has no element in common.
 // Two sets are disjoint if and only if their intersection is the empty set
 func (s HashSet[T]) IsDisjoint(other HashSet[T]) bool {
 	s1, s2 := swapIfLess(s, other)
@@ -134,7 +132,7 @@ func (s HashSet[T]) IsDisjoint(other HashSet[T]) bool {
 	return true
 }
 
-// IsSubset test whether every element in s is also in o
+// IsSubset test whether every element in s is also in other
 func (s HashSet[T]) IsSubset(other HashSet[T]) bool {
 	if s.Len() > other.Len() {
 		return false
@@ -147,7 +145,7 @@ func (s HashSet[T]) IsSubset(other HashSet[T]) bool {
 	return true
 }
 
-// IsSuperset test whether every element in o is also in s
+// IsSuperset test whether every element in other is also in s
 func (s HashSet[T]) IsSuperset(other HashSet[T]) bool {
 	return other.IsSubset(s)
 }
